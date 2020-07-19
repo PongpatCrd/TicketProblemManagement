@@ -1,0 +1,258 @@
+{% extends 'base.html'%}
+{% load custom_tags %}
+{% block content %}
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a class="nav-item nav-link active" id="problem_tab" data-toggle="tab" href="#problem" role="tab"><b>Problem
+        Search</b></a>
+    <a class="nav-item nav-link" id="history_tab" data-toggle="tab" href="#history" role="tab"><b>Problem
+        History</b></a>
+    {% with is_special_member=user.get_username|in_special_member %}
+    {% if is_special_member %}
+    <a class="nav-item nav-link" id="personal_tab" data-toggle="tab" href="#personal" role="tab"><b>Personal 
+      Member Data</b></a>
+    {% endif %}
+    {% endwith %}
+  </div>
+</nav>
+<!-- tab content -->
+<div class="tab-content" id="nav-tabContent">
+  <!-- tab problem -->
+  <div class="tab-pane fade show active" id="problem" role="tabpanel">
+    <!-- filter -->
+    <div class="container-fluid">
+      <div style="margin-top: 15px;">
+        <form action="{% url 'search' %}" id="problem_search" name="problem_search" method="GET">
+          <div style="display: inline-block; width: max-content;">
+            <div class="row">
+              <div class="col">
+                {% if search_branch_code != None%}
+                <span style="display: inline-block;"><b>Branch</b> <input class="wrapper form-control"
+                    name="search_branch_code" type="text" list="branch_name_list" value="{{search_branch_code}}"
+                    required></span>
+                {% else %}
+                <span style="display: inline-block;"><b>Branch</b> <input class="wrapper form-control"
+                    name="search_branch_code" type="text" list="branch_name_list" required></span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <span style="margin-top: 5px; display: inline-block; margin-right: 10px;">
+                  <b>Search by</b>
+                  <select id="search_by" name="search_by" class="wrapper form-control" required>
+                    <option label="Reference number" value="Reference number"></option>
+                    <option label="Name/Email/Phone" value="Name/Email/Phone"></option>
+                  </select>
+                </span>
+
+                {% if search_key != None %}
+                <span style="margin-top: 5px; display: inline-block;"><b>Search key</b> <input
+                    class="wrapper form-control" name="search_key" type="text" value="{{search_key}}" required></span>
+                {% else %}
+                <span style="margin-top: 5px; display: inline-block;"><b>Search key</b> <input
+                    class="wrapper form-control" name="search_key" type="text" required></span>
+                {% endif %}
+                <button class="btn btn-dark" style="margin-bottom: 5px;" type="submit" form="problem_search"><i
+                    class="fas fa-search"></i></button>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+    <hr style="width: 95%; margin-top: 20px;">
+    <!-- filter -->
+
+    <!-- content -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          {% include 'ticket_problem_detail.html' %}
+        </div>
+      </div>
+    </div>
+    <!-- content -->
+
+  </div>
+  <!-- tab problem -->
+
+  <!-- tab history -->
+  <div class="tab-pane fade" id="history" role="tabpanel">
+    <!-- filter -->
+    <div class="container-fluid">
+      <div style="margin-top: 15px;">
+        <form action="{% url 'history' %}" id="history_search" method="GET">
+          <div style="display: inline-block; width: max-content;">
+            <div class="row">
+              <div class="col">
+                <span style="display: inline-block;"><b>Branch</b> <input id="search_history_branch_code"
+                    name="search_history_branch_code" class="wrapper form-control" type="text" list="branch_name_list"
+                    value="{{search_branch_code}}"></span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <span style="margin-top: 5px; display: inline-block;"><b>From date(mm/dd/yyyy)</b> <input
+                    id="search_history_date_from" name="search_history_date_from" class="wrapper form-control"
+                    type="date" required></span>
+                <span style="margin-left: 5px; margin-right: 5px;"><b>-</b></span>
+                <span style="margin-top: 5px; display: inline-block;"><b>To date(mm/dd/yyyy)</b> <input
+                    id="search_history_date_to" name="search_history_date_to" class="wrapper form-control" type="date"
+                    value="{{search_date_to}}" required></span>
+                <button class="btn btn-dark" style="margin-bottom: 5px;" type="submit" form="history_search"><i
+                    class="fas fa-search"></i></button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <hr style="width: 95%; margin-top: 20px;">
+      <!-- filter -->
+
+      <!-- content -->
+      <div class="container-fluid">
+        <div class="row" id="ticket_problem_history_detail">
+          {% include 'ticket_problem_history_detail.html' %}
+        </div>
+      </div>
+      <!-- content -->
+
+    </div>
+  </div>
+  <!-- tab history -->
+
+  {% with is_special_member=user.get_username|in_special_member %}
+  {% if is_special_member %}
+  <!-- tab personal member detail -->
+  <div class="tab-pane fade" id="personal" role="tabpanel">
+    <!-- filter -->
+    <div class="container-fluid">
+      <div style="margin-top: 15px;">
+        <form action="{% url 'personal_member_detail' %}" id="personal_member_detail_search" method="GET">
+          <div style="display: inline-block; width: max-content;">
+
+            <div class="row">
+              <div class="col">
+                <span style="margin-top: 5px; display: inline-block;"><b>Search key</b> <input
+                  class="wrapper form-control" name="personal_search_key" type="text" value="{{search_key}}" autocomplete="off" required></span>
+                
+                <button class="btn btn-dark" style="margin-bottom: 5px;" type="submit" form="personal_member_detail_search"><i
+                  class="fas fa-search"></i></button>
+                <small style="color: red;">* firstname, lastname, fullname, username, email, phone, card number, personID, membershipID</small>
+              </div>
+            </div>
+            
+          </div>
+        </form>
+      </div>
+      <hr style="width: 95%; margin-top: 20px;">
+    <!-- filter -->
+
+    <!-- content -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col" id="personal_member_detail_content">
+          {% include 'personal_member_detail_table.html' %}
+        </div>
+      </div>
+    </div>
+    <!-- content -->
+
+  </div>
+  <!-- tab personal member detail -->
+  {% endif %}
+  {% endwith %}
+
+</div>
+<hr style="width: 95%; margin-top: 20px;">
+<!-- tab content -->
+
+<datalist id="branch_name_list">
+  {% for branch_nickname, detail in branch_names.items %}
+  <option label="({{detail.branch_code_vista}})({{branch_nickname}}) {{ detail.branch_fullname }}"
+    value="{{branch_nickname}}">
+  </option>
+  {% endfor %}
+</datalist>
+
+<script>
+  // problem
+  $('#problem_search').on('submit', function (e) {
+    loading_page(true);
+  });
+
+  $(window).ready(function () {
+    if ('{{search_by}}' != "") {
+      $('#search_by').val('{{search_by}}');
+    }
+  });
+
+  // problem
+
+  // history
+  $('#history_search').on('submit', function (e) {
+    e.preventDefault();
+    loading_page(true);
+
+    $.ajax({
+      type: "GET",
+      url: "{% url 'history' %}",
+      dataType: "json",
+      data: {
+        search_branch_code: $('#search_history_branch_code').val(),
+        search_date_from: $('#search_history_date_from').val(),
+        search_date_to: $('#search_history_date_to').val(),
+      },
+      success: function (response) {
+        loading_page(false);
+        if(response.result == 'success'){
+          $('#ticket_problem_history_detail').html(response.html);
+        }
+        else if(response.result == 'login failed'){
+          window.location.reload();
+        }
+        else{
+          alert_status(response.result);
+        }
+        loading_page(false);
+      },
+    });
+  });
+  // history
+
+  // personal
+  $("#personal_member_detail_search").on('submit', function(e){
+    e.preventDefault();
+    loading_page(true);
+
+    $.ajax({
+      type: 'GET',
+      url: "{% url 'personal_member_detail' %}",
+      dataType: 'json',
+      data: $(this).serialize(),
+      success: function(response){
+        if(response.result == 'success'){
+          $('#personal_member_detail_content').html(response.html);
+        }
+        else if(response.result == 'login failed'){
+          window.location.reload();
+        }
+        else{
+          alert_status(response.result);
+        }
+        loading_page(false);
+      },
+      error: function(response){
+        $("body").html("<h1>Oops! Something went wrong. Please try again later.</h1>");
+        loading_page(false);
+      }
+    });
+  });
+  // personal
+</script>
+
+{% endblock content %}

@@ -1,0 +1,58 @@
+{% block content %}
+{% if cognetic_core_persons == None %}
+{% elif cognetic_core_persons %}
+{% if cognetic_core_persons|length == 1000 %}
+<small style="color: red;"><b>** note: this table show only 1000 newest member that association with search key if search key not clear.</b></small>
+{% endif %}
+<div class="table-responsive">
+  <table class="table table-sm table-hover" style="font-size: 11px;">
+    <thead class="thead-dark">
+      <tr style="text-align: center;">
+        <th scope="col" style="text-align: center;">#</th>
+        <th scope="col" style="text-align: center;">Person ID</th>
+        <th scope="col" style="text-align: center;">Membership ID</th>
+        <th scope="col" style="text-align: center;">First Name</th>
+        <th scope="col" style="text-align: center;">Last Name</th>
+        <th scope="col" style="text-align: center;">Email</th>
+        <th scope="col" style="text-align: center;">Username</th>
+        <th scope="col" style="text-align: center;">Password</th>
+        <th scope="col" style="text-align: center;">Current Club Type</th>
+        <th scope="col" style="text-align: center;">Phone</th>
+        <th scope="col" style="text-align: center;">Gender</th>
+        <th scope="col" style="text-align: center;">Birthday</th>
+        <th scope="col" style="text-align: center;">Membership Expire</th>
+        <th scope="col" style="text-align: center;">Card Number | Card Expire</th>
+        <!-- <th scope="col" style="text-align: center;">Card Numbers</th>
+        <th scope="col" style="text-align: center;">Card Expires</th> -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for cognetic_core_person in cognetic_core_persons %}
+      <tr>
+      <td style="text-align: center;">{{forloop.counter}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.person_id}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.membership_id}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.person_firstname}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.person_lastname}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.person_email}}</td>
+      <td>{{cognetic_core_person.person_username}}</td>
+      <td>{{cognetic_core_person.person_password}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.person_clubid}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.person_mobilephone}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.person_gender}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.person_birthdaydate}} {{cognetic_core_person.person_birthdaymonth}} {{cognetic_core_person.person_centuryofbirth}}{{cognetic_core_person.person_yearofbirth}}</td>
+      <td style="text-align: center;">{{cognetic_core_person.membership_expires}}</td>
+      <td style="text-align: center;">
+        {% for card_detail in cognetic_core_person.card_details %}
+          <p>{{card_detail}}</p>
+        {% endfor %}
+      </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<h5>Data Not Found</h5>
+{% endif %}
+{% endblock content %}

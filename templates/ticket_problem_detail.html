@@ -1,0 +1,224 @@
+{% load custom_tags %}
+{% block content %}
+{% if purchase_ticket_details == None %}
+<div class="container-fluid"></div>
+{% elif result != 'success' %}
+<script>alert_status("{{result}}");</script>
+{% elif purchase_ticket_details|length == 0 %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+      <h5 style="text-align: center;">
+        Data Not Found
+      </h5>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#resolve_problem_popup" style="float: right;">Resolve Problem</button>
+    </div>
+  </div>
+
+  <hr style="width: 95%; margin-top: 20px;">
+
+  <div class="row">
+    <div class="col">
+      <h4>History</h4>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col">
+      {% include 'ticket_problem_history_detail.html' with histories=histories_in_search %}
+    </div>
+  </div>
+
+</div>
+{% else %}
+<div class="container-fluid">
+  <div class="accordion" id="purchase_ticket_detail_collapse" >
+    <!-- generate collapes for each data in formatted_dataset -->
+    {% for purchase_ticket_detail in purchase_ticket_details %}
+    <div class="card">
+      <div class="btn card-header" data-toggle="collapse" data-target="#purchase_ticket_detail_collapse_{{forloop.counter}}" style="cursor:pointer;">
+        <b>Booking datetime [{{purchase_ticket_detail.booking_date}}]</b>
+      </div>
+      
+      <div id="purchase_ticket_detail_collapse_{{forloop.counter}}" class="collapse">
+        <div class="container" style="padding-top: 20px;">
+        <!-- Booking detail -->
+          <div class="row">
+            <h4>Booking details</h4>
+          </div>
+
+          <div class="row">
+            <div class="col-md-5">
+                <p style="float: right; text-align: center; margin-top: 5px;"><b>Booking Date:</b></p>
+            </div>
+            <div class="col-md">
+              <div style="width: 40%">
+                <span style="display: inherit; text-align: center;"><b>{{purchase_ticket_detail.booking_date}}</b></span>
+                <hr style="margin: 0px; padding: 0px; border-width: 2px; border: 1px solid black;">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-5">
+                <p style="float: right; text-align: center; margin-top: 5px;"><b>Payment reference number:</b></p>
+            </div>
+            <div class="col-md">
+              <div style="width: 40%">
+                {% if purchase_ticket_detail.payment_ref_number == '' %}
+                <span style="display: inherit; text-align: center;"><b>-</b></span>
+                {% else %}
+                <span style="display: inherit; text-align: center;"><b>{{purchase_ticket_detail.payment_ref_number}}</b></span>
+                {% endif %}
+                <hr style="margin: 0px; padding: 0px; border-width: 2px; border: 1px solid black;">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-5">
+                <p style="float: right; text-align: center; margin-top: 5px;"><b>Transaction number:</b></p>
+            </div>
+            <div class="col-md">
+              <div style="width: 40%">
+                <span style="display: inherit; text-align: center;"><b>{{purchase_ticket_detail.trans_number}}</b></span>
+                <hr style="margin: 0px; padding: 0px; border-width: 2px; border: 1px solid black;">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-5">
+                <p style="float: right; text-align: center; margin-top: 5px;"><b>Booking number:</b></p>
+            </div>
+            <div class="col-md">
+              <div style="width: 40%">
+                <span style="display: inherit; text-align: center;"><b>{{purchase_ticket_detail.booking_number}}</b></span>
+                <hr style="margin: 0px; padding: 0px; border-width: 2px; border: 1px solid black;">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-5">
+                <p style="float: right; text-align: center; margin-top: 5px;"><b>Payment type:</b></p>
+            </div>
+            <div class="col-md">
+              <div style="width: 40%; display: block;">
+                {% for payment_type_detail in purchase_ticket_detail.payment_type %}
+                <div class="rounded" style="margin-right: 5px;">
+                  <span><b>{{payment_type_detail}}</b></span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-5">
+                <p style="float: right; text-align: center; margin-top: 5px;"><b>Price method:</b></p>
+            </div>
+            <div class="col-md">
+              <div style="width: 40%; display: block;">
+                {% for price_method_detail in purchase_ticket_detail.price_method %}
+                <div class="rounded" style="margin-right: 5px;">
+                  <span><b>{{price_method_detail}}</b></span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-5">
+                <p style="float: right; text-align: center; margin-top: 5px;"><b>Total price:</b></p>
+            </div>
+            <div class="col-md">
+              <div style="width: 40%; display: block;">
+                <div class="rounded">
+                  <span><b>{{purchase_ticket_detail.total_price}}</b></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        <!-- Ticket details  -->
+          <div class="row">
+            <h4>Ticket details</h4>
+          </div>
+
+          <div class="row">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr style="text-align: center;">
+                    <th scope="col">#</th>
+                    <th scope="col">Showtime</th>
+                    <th scope="col">Movie Name</th>
+                    <th scope="col">Theatre</th>
+                    <th scope="col">Seat Type</th>
+                    <th scope="col">Seat Row</th>
+                    <th scope="col">Seat Number</th>
+                    <th scope="col">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for per_ticket_detail in purchase_ticket_detail.per_ticket_details %}
+                  <tr>
+                    <th style="text-align: center;">{{forloop.counter}}</th>
+                    <td style="text-align: center;">{{per_ticket_detail.showtime}}</td>
+                    <td>{{per_ticket_detail.movie_name}}</td>
+                    <td style="text-align: center;">{{per_ticket_detail.teatre}}</td>
+                    <td style="text-align: center;">{{per_ticket_detail.seat_type}}</td>
+                    <td style="text-align: center;">{{per_ticket_detail.seat_row}}</td>
+                    <td style="text-align: center;">{{per_ticket_detail.seat_number}}</td>
+                    <td style="text-align: center;">{{per_ticket_detail.price}}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <!-- <div style="width: 100%;">
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#resolve_problem_popup" style="float: right;">Resolve Problem</button>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if purchase_ticket_details.has_other_pages %}  
+    <ul class="pagination">
+      <div style="width: 100%; margin-top: 20px;">
+        <div style="text-align: center;">
+          <form  action="." id="go_to_page" name="go_to_page" method="GET">
+            {% if purchase_ticket_details.has_previous  %}
+              <a href="?{% url_replace page=purchase_ticket_details.previous_page_number %}"><i class="fas fa-chevron-circle-left"></i></a>
+            {% endif %}
+            <input id="page" name="page" type="text"oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="text-align: center; width: 50px;" value="{{purchase_ticket_details.number}}">
+            <b>of {{last_page}}</b> <span><button type="submit" class="btn-dark">GO</button></span>
+            {% if purchase_ticket_details.has_next %}
+              <a href="?{% url_replace page=purchase_ticket_details.next_page_number %}"><i class="fas fa-chevron-circle-right"></i></a>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+    </ul>
+  {% endif %}
+
+</div>
+{% endif %}
+
+<script>
+  $(document).ready(function(){
+    $('#purchase_ticket_detail_collapse_1').addClass('show');
+  });
+</script>
+
+{% endblock content %}

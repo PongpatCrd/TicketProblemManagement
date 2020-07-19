@@ -1,0 +1,189 @@
+{% block content %}
+<div class="modal fade" id="resolve_problem_popup" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Resolve problem details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{% url 'resolve_problem_save' %}" id="resolve_problem_form" method="POST">
+        {% csrf_token %}
+        <div class="modal-body">
+            <p><b>Reason of problem</b></p>
+            <textarea id="problem_reason" name="problem_reason" id="problem_reason" style="width: 100%; height: 100px;" required></textarea>
+            <hr style="width: 90%;">
+            <p><b>Resolve method</b></p>
+            <div class="radio">
+              <label><input type="radio" name="resolve_method" value="คืนเงินสดหน้างาน" required> คืนเงินสดหน้างาน</label>
+            </div>
+            <div class="radio">
+              <label><input type="radio" name="resolve_method" value="คืนเงินผ่านบัญชี" required> คืนเงินผ่านบัญชี</label>
+            </div>
+            <div class="radio">
+              <label><input type="radio" name="resolve_method" value="คืนผ่านระบบ web portal" required> คืนผ่านระบบ web portal</label>
+            </div>
+            <div class="radio">
+              <label><input type="radio" name="resolve_method" value="ให้ apologized GV ลูกค้า" required> ให้ apologized GV ลูกค้า</label>
+            </div>
+            <div class="radio">
+              <label><input type="radio" name="resolve_method" value="lock ที่นั่งให้ลูกค้า" required> lock ที่นั่งให้ลูกค้า</label>
+            </div>
+            <hr>
+            <div id="bank_detail" name="bank_detail" hidden>
+              <p><b>Details</b></p>
+              <label style="margin-top: 5px;">
+                Bank name: <select name="bank_id" id="bank_id">
+                  {% for bank_detail in bank_list %}
+                  <option value="{{bank_detail.id}}">{{bank_detail.name}}</option>
+                  {% endfor %}
+                  <option value="-1">other</option>
+                </select>
+                <input type="text" name="other_bank_name" id="other_bank_name" placeholder="ex. SCB" style="margin-left: 7px;" hidden/>
+              </label>
+              <br>
+              <label>
+                Bank location<br><input type="text" name="bank_location" id="bank_location" placeholder="ex. ปิ่นเกล้า">
+              </label>
+              <br>
+              <label>
+                Account number<br><input type="text" name="account_number" id="account_number" placeholder="ex. 123456789000">
+              </label>
+              <br>
+              <label>
+                Account name<br><input type="text" name="account_name" id="account_name">
+              </label>
+              <br>
+              <label>
+                Transferred datetime(mm/dd/yyyy)<br>
+                <input type="date" name="trans_date" id="trans_date">
+                  Time <input type="text" maxlength="4" name="trans_time" id="trans_time" style="width: 60px;"/>                  
+              </label>
+            </div>
+        </div>
+        <input id="resolve_search_by" type="text" value="{{search_by}}" hidden/>
+        <input id="resolve_search_key" type="text" value="{{search_key}}" hidden/>
+        <input id="resolve_search_branch_code" type="text" value="{{search_branch_code}}" hidden/>
+      </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success" form="resolve_problem_form">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // resolve_problem_modal
+  function is_numeric(str){
+    var numbers = /^[0-9]+$/;
+    if(str.value.match(numbers)){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
+  $("input[name='resolve_method']").on('click', function(){
+    if(this.value == 'คืนเงินผ่านบัญชี'){
+      $('#bank_detail').prop("hidden", false);
+      $('#bank_detail :input').prop('required', true);
+      $('#other_bank_name').prop('required', false);
+    }
+    else{
+      $('#bank_detail').prop("hidden", true);
+      $('#bank_detail :input').prop('required', false);
+    }
+  });
+
+  $('#trans_time').on('change', function(){
+    var time = this.value;
+    if(time.length != 4 || !is_numeric(time)){
+      this.value = "";
+      alert("Invalid time format. Please input 4 digits ex. 1230");
+    }
+  });
+
+  $('#bank_id').on('change', function(){
+    if(this.value == -1){
+      $("#other_bank_name").prop("hidden", false);
+      $('#other_bank_name').prop('required', true);
+    }
+    else{
+      $("#other_bank_name").prop("hidden", true);
+      $('#other_bank_name').prop('required', false);
+    }
+  });
+
+  $("input[name='resolve_method']").on('click', function(){
+    if(this.value == 'คืนเงินผ่านบัญชี'){
+      var current_date = new Date();
+      var date = current_date.getDate();
+      var month = current_date.getMonth()+1;
+      var year = current_date.getFullYear();
+      var hours = current_date.getHours();
+      var minutes = current_date.getMinutes();
+
+      if(date < 10){
+        date = "0" + date.toString();
+      }
+
+      if(month < 10){
+        month = "0" + month.toString();
+      }
+
+      if(hours < 10){
+        hours = "0" + hours.toString();
+      }
+
+      if(minutes < 10){
+        minutes = "0" + minutes.toString();
+      }
+
+      var current_date = year + "-" + month + "-" + date;
+      var current_time = hours + "" + minutes;
+
+      $("#trans_date").val(current_date);
+      $("#trans_time").val(current_time);
+    }
+  });
+
+  $(document).on('submit', '#resolve_problem_form', function(e){
+    e.preventDefault();
+    loading_page(true);
+    $('#resolve_problem_popup').modal('hide');
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'resolve_problem_save' %}",
+      dataType: "json",
+      data: {
+        search_branch_code : $('#resolve_search_branch_code').val(),
+        search_by          : $('#resolve_search_by').val(),
+        search_key         : $('#resolve_search_key').val(),
+        problem_reason     : $('#problem_reason').val(),
+        resolve_method     : $("input[name='resolve_method']:checked").val(),
+        bank_id            : $('#bank_id').val(),
+        other_bank_name    : $('#other_bank_name').val(),
+        bank_location      : $('#bank_location').val(),
+        account_number     : $('#account_number').val(),
+        account_name       : $('#account_name').val(),
+        trans_date         : $('#trans_date').val(),
+        trans_time         : $('#trans_time').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(json){
+        alert(json.result);
+        window.location.reload(); 
+      },
+      error: function(){
+        window.location.reload();
+        alert("Oops!. Something went wrong, Please try again.");
+      }
+    });
+  });
+  // resolve_problem_modal
+</script>
+{% endblock content %}

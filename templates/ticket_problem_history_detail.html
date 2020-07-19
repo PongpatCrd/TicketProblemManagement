@@ -1,0 +1,55 @@
+{% block content %}
+  {% if histories == None %}
+  <div class="container-fluid"></div>
+  {% elif result != 'success' %}
+  <script>alert_status("{{result}}");</script>
+  {% elif histories|length == 0 %}
+  <div class="container-fluid">
+    <h5 style="text-align: center;">
+      Empty
+    </h5>
+  </div>
+  {% else %}
+
+<style>
+.table-responsive{
+  overflow-y: auto;
+  overflow-x: auto;
+  max-height: 400px;
+}
+</style>
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr style="text-align: center;">
+            <th scope="col">#</th>
+            <th scope="col">Branch</th>
+            <th scope="col">Search by</th>
+            <th scope="col">Search key</th>
+            <th scope="col">Reason</th>
+            <th scope="col">Solution</th>
+            <th scope="col">Resolve username</th>
+            <th scope="col">Resolve IP</th>
+            <th scope="col">Resolve date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for detail in histories %}
+            <tr>
+              <td style="text-align: center;">{{forloop.counter}}</td>
+              <td style="text-align: center;">{{detail.branch_code}}</td>
+              <td style="text-align: center;">{{detail.search_by}}</td>
+              <td style="text-align: center;">{{detail.search_key}}</td>
+              <td style="text-align: center;">{{detail.reason}}</td>
+              <td style="text-align: center;">{{detail.solution}}</td>
+              <td style="text-align: center;">{{detail.username}}</td>
+              <td style="text-align: center;">{{detail.ip}}</td>
+              <td style="text-align: center;">{{detail.updated_at}}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endblock content %}
